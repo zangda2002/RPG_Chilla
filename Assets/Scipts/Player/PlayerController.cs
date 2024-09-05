@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : SingleTon<PlayerController>
@@ -15,6 +16,8 @@ public class PlayerController : SingleTon<PlayerController>
    private SpriteRenderer mySpriteRender;
    private float startingMoveSpeed;
 
+   private AudioManager adm;
+
    public bool FacingLeft {get {return facingLeft; } }
    private bool facingLeft = false;
 
@@ -28,7 +31,8 @@ public class PlayerController : SingleTon<PlayerController>
 
 	myAnimator = GetComponent<Animator>();
 	mySpriteRender = GetComponent<SpriteRenderer>();
-   }
+    adm = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
    private void Start() {
    	playerControls.Combat.Dash.performed +=_=> Dash();
@@ -36,16 +40,20 @@ public class PlayerController : SingleTon<PlayerController>
    }
 
    private void OnEnable(){
-	playerControls.Enable();
+        playerControls.Enable();
    }
 
    private void Update(){
-	PlayerInput();
-   }
+		PlayerInput();
+		if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D))
+		{
+			adm.PlayerSFX(adm.grassWalk);
+		}
+    }
 
    private void FixedUpdate(){
 	AdjustPlayerFacingDirection();
-	Move();
+        Move();
    }
 
    private void PlayerInput(){
@@ -53,11 +61,11 @@ public class PlayerController : SingleTon<PlayerController>
 
 	myAnimator.SetFloat("MoveX", movement.x);
 	myAnimator.SetFloat("MoveY", movement.y);
-   }
+    }
 
    private void Move(){
    	rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
-   }
+    }
 
    private void AdjustPlayerFacingDirection(){
    	Vector3 mousePos = Input.mousePosition;
@@ -72,8 +80,6 @@ public class PlayerController : SingleTon<PlayerController>
 		facingLeft = false;
 	}
    }
-
-
    private void Dash(){
 	if(!isDashing){
 		isDashing = true;
@@ -83,7 +89,6 @@ public class PlayerController : SingleTon<PlayerController>
 	}
    }
 
-	
    private IEnumerator EndDashRoutine(){
 	float dashTime = .2f;
 	float dashCD = .25f;

@@ -12,10 +12,12 @@ public class EnemiesHealth : MonoBehaviour
 	private KnockBack kb;
 	private Flash flash;
 
+	private AudioManager adm;
 	private void Awake()
 	{
 		flash = GetComponent<Flash>();
 		kb = GetComponent<KnockBack>();
+		adm = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
 	}
 
 
@@ -38,6 +40,7 @@ public class EnemiesHealth : MonoBehaviour
 	public void DetectDeath(){
 		if(currentHealth <= 0) {
 			Instantiate(deathVFXprefab, transform.position, Quaternion.identity);
+			adm.PlayerSFX(adm.death);
 			Destroy(gameObject);
 		}
 	}
